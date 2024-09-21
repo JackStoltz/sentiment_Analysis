@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Analysis Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Sentiment Analysis Result</h1>
+        
+        <div class="mt-4">
+            <h3>Input Text:</h3>
+            <p>{{ user_input }}</p>
+        </div>
+        
+        <div class="mt-4">
+            <h3>Sentiment:</h3>
+            <p class="fs-4">
+                {% if sentiment == 'Positive' %}
+                    <span class="badge bg-success">{{ sentiment }}</span>
+                {% elif sentiment == 'Negative' %}
+                    <span class="badge bg-danger">{{ sentiment }}</span>
+                {% elif sentiment == 'Error' %}
+                    <span class="badge bg-danger">{{ sentiment }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ sentiment }}</span>
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="mt-4">
+            <h3>Sentiment Probability:</h3>
+            <div id="probability-chart"></div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/" class="btn btn-secondary">Analyze Another Text</a>
+        </div>
+    </div>
+
+    <script>
+        // Assign separate probability variables passed from Flask
+        var negativeProba = {{ negative_proba }};
+        var positiveProba = {{ positive_proba }};
+        console.log("Negative Probability:", negativeProba);
+        console.log("Positive Probability:", positiveProba);
+
+        // Validate that probabilities are numbers
+        if (typeof negativeProba === 'number' && typeof positiveProba === 'number') {
+            var data = [{
+                type: 'bar',
+                x: ['Negative', 'Positive'],
+                y: [negativeProba, positiveProba],
+                marker: {
+                    color: ['#dc3545', '#28a745']
+                }
+            }];
+
+            var layout = {
+                title: 'Sentiment Probability',
+                yaxis: {title: 'Probability'},
+                xaxis: {title: 'Sentiment'},
+                margin: { t: 50, b: 50 }
+            };
+
+            Plotly.newPlot('probability-chart', data, layout);
+        } else {
+            // Handle cases where probabilities are not numbers
+            document.getElementById('probability-chart').innerHTML = '<p class="text-danger">Error: Invalid probability data received.</p>';
+            console.error("Invalid probability data:", negativeProba, positiveProba);
+        }
+    </script>
+</body>
+</html>
