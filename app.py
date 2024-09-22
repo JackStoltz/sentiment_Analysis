@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import string
 import os
-
+ 
 app = Flask(__name__)
 
 # Load the trained model and vectorizer
